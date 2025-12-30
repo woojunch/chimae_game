@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>뉴스 퍼즐 - 디자인 리마스터</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* 세련된 컬러 팔레트 */
+        --bg-color: #f0f2f5;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-sub: #868e96;
+
+        --brand-color: #4dabf7; /* 시원한 파랑 */
+        --brand-dark: #339af0;
+
+        --slot-bg: #e9ecef; /* 빈칸 기본 배경 */
+        --slot-border: #ced4da;
+
+        --focus-color: #ff922b; /* 포커스 (따뜻한 주황) */
+        --focus-glow: rgba(255, 146, 43, 0.4);
+
+        --success-color: #40c057;
+        --error-color: #fa5252;
+      }
+
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 720px;
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      /* 타이틀 섹션 */
+      h1 {
+        font-size: 2rem;
+        margin: 0 0 10px 0;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-sub);
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .game-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+      }
+      .game-section.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* --- [뉴스 본문 디자인 개선] --- */
+      .news-box {
+        background-color: #fafbfd; /* 아주 연한 푸른 회색 배경 */
+        border: 1px solid #e9ecef;
+        padding: 30px;
+        border-radius: 16px;
+        font-size: 1.35rem; /* 어르신 배려 큰 폰트 */
+        line-height: 2.2; /* ★ 중요: 줄간격을 넓혀 빈칸이 겹치지 않게 함 */
+        text-align: left;
+        margin-bottom: 30px;
+        word-break: keep-all; /* 단어 단위 줄바꿈 */
+        color: #495057;
+      }
+
+      /* 하이라이트 (읽기 모드) */
+      .highlight {
+        font-weight: 700;
+        color: var(--brand-dark);
+        background: linear-gradient(
+          to top,
+          #dbe4ff 50%,
+          transparent 50%
+        ); /* 형광펜 느낌 */
+        padding: 0 2px;
+      }
+
+      /* --- [빈칸 슬롯 디자인 개선] --- */
+      .empty-slot {
+        display: inline-flex; /* Inline-block 보다 정렬이 용이 */
+        align-items: center;
+        justify-content: center;
+        min-width: 90px;
+        height: 42px; /* 고정 높이 */
+        padding: 0 12px;
+        margin: 0 6px;
+        vertical-align: middle; /* ★ 중요: 텍스트 중앙 정렬 핵심 */
+
+        background-color: var(--slot-bg);
+        border: 2px solid var(--slot-border);
+        border-radius: 10px; /* 둥글둥글하게 */
+
+        color: #495057;
+        font-weight: 700;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transform: translateY(-2px); /* 시각적 보정 */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+      }
+
+      /* 빈칸 활성 (포커스) 애니메이션 */
+      .empty-slot.active-focus {
+        background-color: #fff;
+        border-color: var(--focus-color);
+        box-shadow: 0 0 0 4px var(--focus-glow); /* 부드러운 글로우 */
+        transform: scale(1.05) translateY(-2px);
+        z-index: 10;
+      }
+
+      .empty-slot.filled {
+        background-color: #e7f5ff;
+        border-color: var(--brand-color);
+        color: var(--brand-dark);
+        box-shadow: 0 2px 5px rgba(51, 154, 240, 0.2);
+      }
+
+      /* 정답/오답 스타일 */
+      .empty-slot.correct {
+        background-color: #d3f9d8;
+        border-color: var(--success-color);
+        color: #2b8a3e;
+      }
+      .empty-slot.wrong {
+        background-color: #ffe3e3;
+        border-color: var(--error-color);
+        color: #c92a2a;
+        text-decoration: line-through;
+      }
+
+      /* --- [단어 꾸러미 디자인] --- */
+      .word-bank-area {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 24px;
+        border-radius: 16px;
+        margin-top: 20px;
+      }
+
+      .word-chip {
+        display: inline-block;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: var(--text-main);
+        padding: 12px 24px;
+        margin: 6px;
+        border-radius: 50px; /* 캡슐 모양 */
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
+      }
+
+      .word-chip:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+        border-color: var(--brand-color);
+        color: var(--brand-color);
+      }
+
+      .word-chip.used {
+        opacity: 0.4;
+        transform: scale(0.95);
+        background-color: #e9ecef;
+        border-color: transparent;
+        box-shadow: none;
+        cursor: default;
+      }
+
+      /* 버튼 스타일 */
+      .btn {
+        background-color: var(--text-main);
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        margin: 10px 5px;
+        transition: transform 0.2s, background 0.2s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary {
+        background-color: var(--brand-dark);
+      }
+      .btn-primary:hover {
+        background-color: var(--brand-color);
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+      }
+      .btn-success:hover {
+        background-color: #37b24d;
+      }
+
+      .btn-hint {
+        background-color: white;
+        color: var(--text-sub);
+        border: 2px solid #dee2e6;
+        box-shadow: none;
+      }
+      .btn-hint:hover {
+        border-color: var(--text-sub);
+        color: var(--text-main);
+      }
+
+      /* 타이머 및 결과 */
+      .timer-display {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--focus-color);
+        margin: 20px 0;
+        font-variant-numeric: tabular-nums; /* 숫자 너비 고정 */
+      }
+
+      .result-badge {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+      .result-score {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--brand-dark);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="start-screen" class="game-section active">
+        <h1>🧠 오늘의 두뇌 트레이닝</h1>
+        <p class="subtitle">
+          뉴스를 읽고 기억력을 테스트해보세요.<br />단어를 터치하여 문장을
+          완성하는 퍼즐입니다.
+        </p>
+        <div style="font-size: 5rem; margin: 40px 0">🧩</div>
+        <button class="btn btn-primary" onclick="startGame()">
+          지금 시작하기
+        </button>
+      </div>
+
+      <div id="reading-screen" class="game-section">
+        <h1>주요 단어 기억하기</h1>
+        <div class="timer-display" id="timer">30</div>
+        <div class="news-box" id="reading-content"></div>
+        <button class="btn btn-success" onclick="finishReadingEarly()">
+          다 읽었어요!
+        </button>
+      </div>
+
+      <div id="quiz-screen" class="game-section">
+        <h1 style="font-size: 1.5rem">반짝이는 빈칸을 채워주세요 ✨</h1>
+
+        <div class="news-box" id="quiz-content"></div>
+
+        <div class="word-bank-area" id="word-bank">
+          <p style="color: #adb5bd; font-size: 0.9rem; margin-top: 0">
+            👇 아래 단어를 선택하세요
+          </p>
+          <div id="chips-container"></div>
+        </div>
+
+        <div style="margin-top: 30px">
+          <button
+            class="btn btn-hint"
+            id="btn-hint"
+            onclick="openOriginalArticle()"
+          >
+            🔗 힌트 보기
+          </button>
+          <button
+            class="btn btn-primary"
+            id="btn-check"
+            onclick="checkAnswers()"
+          >
+            정답 확인
+          </button>
+          <button
+            class="btn btn-success"
+            id="btn-result"
+            style="display: none"
+            onclick="showResultPage()"
+          >
+            결과 보기 👉
+          </button>
+        </div>
+      </div>
+
+      <div id="result-screen" class="game-section">
+        <h1>결과 리포트</h1>
+        <div class="result-badge" id="result-emoji">🤔</div>
+        <div class="result-score" id="score-display"></div>
+        <p id="feedback-msg" class="subtitle" style="margin-top: 15px"></p>
+        <button class="btn btn-primary" onclick="location.reload()">
+          새로운 뉴스 보기
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // --- 데이터 (예시) ---
+      const todayNews = {
+        title: "신종 보이스피싱 '부고 문자' 주의보",
+        url: "https://news.naver.com",
+        content: `최근 지인을 사칭하여 가짜 모바일 부고장을 보내는 신종 {{보이스피싱}} 범죄가 기승을 부리고 있어 각별한 주의가 필요합니다.
+
+경찰청은 문자에 포함된 인터넷 주소(URL)를 누를 경우, 스마트폰에 악성 {{앱}}이 설치되어 {{개인정보}}가 유출될 수 있다고 경고했습니다. 피해를 막기 위해서는 출처가 불분명한 문자는 즉시 {{삭제}}하고, 의심될 경우 경찰청(112)이나 금융감독원에 {{신고}}해야 합니다.`,
+      };
+
+      const readingTimeLimit = 30;
+      let timeLeft = readingTimeLimit;
+      let timerInterval;
+      let correctAnswers = [];
+
+      // --- 로직 (디자인만 변경되었으므로 로직은 유사함) ---
+
+      function prepareReadingText() {
+        // 하이라이트 디자인 적용
+        let formattedText = todayNews.content.replace(
+          /\{\{(.*?)\}\}/g,
+          '<span class="highlight">$1</span>'
+        );
+        document.getElementById("reading-content").innerHTML = formattedText;
+      }
+
+      function prepareQuizAndBank() {
+        correctAnswers = [];
+        let slotIndex = 0;
+
+        // 빈칸 생성 (디자인 개선된 empty-slot 클래스 적용)
+        let quizText = todayNews.content.replace(
+          /\{\{(.*?)\}\}/g,
+          function (match, p1) {
+            correctAnswers.push(p1);
+            // vertical alignment를 위해 스타일 조정 없이 클래스로만 제어
+            let slotHtml = `<span class="empty-slot" id="slot-${slotIndex}" onclick="returnWord(${slotIndex})" data-answer="${p1}"></span>`;
+            slotIndex++;
+            return slotHtml;
+          }
+        );
+        document.getElementById("quiz-content").innerHTML = quizText;
+
+        // 단어 칩 생성
+        const chipsContainer = document.getElementById("chips-container");
+        chipsContainer.innerHTML = "";
+
+        let shuffledAnswers = [...correctAnswers];
+        // 셔플 알고리즘
+        for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledAnswers[i], shuffledAnswers[j]] = [
+            shuffledAnswers[j],
+            shuffledAnswers[i],
+          ];
+        }
+
+        shuffledAnswers.forEach((word, index) => {
+          let btn = document.createElement("div"); // button 대신 div로 변경 (스타일링 용이)
+          btn.className = "word-chip";
+          btn.innerText = word;
+          btn.id = `chip-${index}`;
+          btn.onclick = function () {
+            selectWord(this, word);
+          };
+          chipsContainer.appendChild(btn);
+        });
+      }
+
+      // 포커스 업데이트 (CSS Glow 효과 적용)
+      function updateFocus() {
+        document
+          .querySelectorAll(".empty-slot")
+          .forEach((slot) => slot.classList.remove("active-focus"));
+        const targetSlot = document.querySelector(".empty-slot:not(.filled)");
+        if (targetSlot) targetSlot.classList.add("active-focus");
+      }
+
+      function selectWord(chipElement, word) {
+        const targetSlot = document.querySelector(".empty-slot:not(.filled)");
+        if (targetSlot) {
+          targetSlot.innerText = word;
+          targetSlot.classList.add("filled");
+          targetSlot.dataset.sourceChipId = chipElement.id;
+
+          // 칩 애니메이션과 함께 비활성화
+          chipElement.classList.add("used");
+
+          updateFocus();
+        } else {
+          // 빈칸이 꽉 찼을 때 흔들림 효과 같은걸 줄 수 있음 (여기선 생략)
+          alert("빈칸이 모두 채워졌습니다. 수정하려면 빈칸을 누르세요.");
+        }
+      }
+
+      function returnWord(slotIndex) {
+        const slot = document.getElementById(`slot-${slotIndex}`);
+        if (slot.classList.contains("filled")) {
+          const chipId = slot.dataset.sourceChipId;
+          const chip = document.getElementById(chipId);
+          if (chip) chip.classList.remove("used");
+
+          slot.innerText = "";
+          slot.classList.remove("filled");
+          delete slot.dataset.sourceChipId;
+
+          updateFocus();
+        }
+      }
+
+      function startGame() {
+        prepareReadingText();
+        prepareQuizAndBank();
+        showSection("reading-screen");
+
+        timeLeft = readingTimeLimit;
+        document.getElementById("timer").innerText = timeLeft;
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById("timer").innerText = timeLeft;
+          if (timeLeft <= 0) finishReadingEarly();
+        }, 1000);
+      }
+
+      function finishReadingEarly() {
+        clearInterval(timerInterval);
+        showSection("quiz-screen");
+        setTimeout(updateFocus, 100);
+      }
+
+      function checkAnswers() {
+        const slots = document.querySelectorAll(".empty-slot");
+        let correctCount = 0;
+        let totalCount = slots.length;
+
+        document
+          .querySelectorAll(".empty-slot")
+          .forEach((s) => s.classList.remove("active-focus"));
+
+        slots.forEach((slot) => {
+          const userAnswer = slot.innerText.trim();
+          const correctAnswer = slot.dataset.answer;
+
+          slot.onclick = null; // 클릭 방지
+          slot.style.cursor = "default";
+
+          if (userAnswer === correctAnswer) {
+            slot.classList.add("correct");
+            correctCount++;
+          } else {
+            slot.classList.add("wrong");
+          }
+        });
+
+        document.getElementById("word-bank").style.display = "none";
+        document.getElementById("btn-check").style.display = "none";
+        document.getElementById("btn-hint").style.display = "none";
+        document.getElementById("btn-result").style.display = "inline-block";
+
+        window.lastScore = correctCount;
+        window.lastTotal = totalCount;
+      }
+
+      function showResultPage() {
+        showSection("result-screen");
+        const scoreDisplay = document.getElementById("score-display");
+        const feedbackMsg = document.getElementById("feedback-msg");
+        const emojiDisplay = document.getElementById("result-emoji");
+
+        const score = window.lastScore;
+        const total = window.lastTotal;
+        const percentage = (score / total) * 100;
+
+        scoreDisplay.innerText = `${total}문제 중 ${score}개 정답`;
+
+        if (percentage === 100) {
+          emojiDisplay.innerText = "🏆";
+          feedbackMsg.innerText = "완벽합니다! 명석한 두뇌의 소유자시군요.";
+        } else if (percentage >= 70) {
+          emojiDisplay.innerText = "👏";
+          feedbackMsg.innerText = "훌륭해요! 대부분의 내용을 기억하셨습니다.";
+        } else {
+          emojiDisplay.innerText = "🍀";
+          feedbackMsg.innerText =
+            "수고하셨어요! 매일 연습하면 기억력이 좋아집니다.";
+        }
+      }
+
+      function openOriginalArticle() {
+        window.open(todayNews.url, "_blank");
+      }
+
+      function showSection(sectionId) {
+        document
+          .querySelectorAll(".game-section")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+      }
+    </script>
+  </body>
+</html>
