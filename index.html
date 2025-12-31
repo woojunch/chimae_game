@@ -1,546 +1,497 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>뉴스 퍼즐 - 디자인 리마스터</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>금주의 뉴스 퍼즐</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-      :root {
-        /* 세련된 컬러 팔레트 */
-        --bg-color: #f0f2f5;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-sub: #868e96;
-
-        --brand-color: #4dabf7; /* 시원한 파랑 */
-        --brand-dark: #339af0;
-
-        --slot-bg: #e9ecef; /* 빈칸 기본 배경 */
-        --slot-border: #ced4da;
-
-        --focus-color: #ff922b; /* 포커스 (따뜻한 주황) */
-        --focus-glow: rgba(255, 146, 43, 0.4);
-
-        --success-color: #40c057;
-        --error-color: #fa5252;
-      }
-
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        margin: 0;
-        padding: 20px;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .container {
-        background: var(--card-bg);
-        width: 100%;
-        max-width: 720px;
-        padding: 40px;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
-        text-align: center;
-        transition: all 0.3s ease;
-      }
-
-      /* 타이틀 섹션 */
-      h1 {
-        font-size: 2rem;
-        margin: 0 0 10px 0;
-        color: var(--text-main);
-        letter-spacing: -0.02em;
-      }
-      .subtitle {
-        font-size: 1.1rem;
-        color: var(--text-sub);
-        margin-bottom: 30px;
-        line-height: 1.5;
-      }
-
-      .game-section {
-        display: none;
-        animation: fadeIn 0.5s ease;
-      }
-      .game-section.active {
-        display: block;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-sub: #868e96;
+            --brand-color: #4dabf7;
+            --brand-dark: #339af0;
+            --focus-color: #ff922b;
+            --focus-glow: rgba(255, 146, 43, 0.4);
+            --success-color: #40c057;
+            --error-color: #fa5252;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-      }
 
-      /* --- [뉴스 본문 디자인 개선] --- */
-      .news-box {
-        background-color: #fafbfd; /* 아주 연한 푸른 회색 배경 */
-        border: 1px solid #e9ecef;
-        padding: 30px;
-        border-radius: 16px;
-        font-size: 1.35rem; /* 어르신 배려 큰 폰트 */
-        line-height: 2.2; /* ★ 중요: 줄간격을 넓혀 빈칸이 겹치지 않게 함 */
-        text-align: left;
-        margin-bottom: 30px;
-        word-break: keep-all; /* 단어 단위 줄바꿈 */
-        color: #495057;
-      }
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 720px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+        }
 
-      /* 하이라이트 (읽기 모드) */
-      .highlight {
-        font-weight: 700;
-        color: var(--brand-dark);
-        background: linear-gradient(
-          to top,
-          #dbe4ff 50%,
-          transparent 50%
-        ); /* 형광펜 느낌 */
-        padding: 0 2px;
-      }
+        h1 { font-size: 2rem; margin: 0 0 10px 0; letter-spacing: -0.02em; }
+        .subtitle { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 30px; line-height: 1.5; }
 
-      /* --- [빈칸 슬롯 디자인 개선] --- */
-      .empty-slot {
-        display: inline-flex; /* Inline-block 보다 정렬이 용이 */
-        align-items: center;
-        justify-content: center;
-        min-width: 90px;
-        height: 42px; /* 고정 높이 */
-        padding: 0 12px;
-        margin: 0 6px;
-        vertical-align: middle; /* ★ 중요: 텍스트 중앙 정렬 핵심 */
+        .game-section { display: none; animation: fadeIn 0.4s ease; }
+        .game-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        background-color: var(--slot-bg);
-        border: 2px solid var(--slot-border);
-        border-radius: 10px; /* 둥글둥글하게 */
+        /* --- 메뉴 그리드 스타일 --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
+            gap: 20px;
+            margin-top: 30px;
+        }
 
-        color: #495057;
-        font-weight: 700;
-        font-size: 1.2rem;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-        transform: translateY(-2px); /* 시각적 보정 */
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
-      }
+        .menu-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-      /* 빈칸 활성 (포커스) 애니메이션 */
-      .empty-slot.active-focus {
-        background-color: #fff;
-        border-color: var(--focus-color);
-        box-shadow: 0 0 0 4px var(--focus-glow); /* 부드러운 글로우 */
-        transform: scale(1.05) translateY(-2px);
-        z-index: 10;
-      }
+        .menu-card:hover {
+            border-color: var(--brand-color);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
-      .empty-slot.filled {
-        background-color: #e7f5ff;
-        border-color: var(--brand-color);
-        color: var(--brand-dark);
-        box-shadow: 0 2px 5px rgba(51, 154, 240, 0.2);
-      }
+        .menu-icon { font-size: 3rem; margin-bottom: 15px; }
+        .menu-title { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+        .menu-desc { font-size: 0.9rem; color: var(--text-sub); margin-top: 5px; }
 
-      /* 정답/오답 스타일 */
-      .empty-slot.correct {
-        background-color: #d3f9d8;
-        border-color: var(--success-color);
-        color: #2b8a3e;
-      }
-      .empty-slot.wrong {
-        background-color: #ffe3e3;
-        border-color: var(--error-color);
-        color: #c92a2a;
-        text-decoration: line-through;
-      }
+        /* --- 뉴스 본문 스타일 --- */
+        .news-box {
+            background-color: #fafbfd;
+            border: 1px solid #e9ecef;
+            padding: 30px;
+            border-radius: 16px;
+            font-size: 1.35rem;
+            line-height: 2.2;
+            text-align: left;
+            margin-bottom: 30px;
+            word-break: keep-all;
+            color: #495057;
+        }
 
-      /* --- [단어 꾸러미 디자인] --- */
-      .word-bank-area {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        padding: 24px;
-        border-radius: 16px;
-        margin-top: 20px;
-      }
+        .highlight {
+            font-weight: 700;
+            color: var(--brand-dark);
+            background: linear-gradient(to top, #dbe4ff 50%, transparent 50%);
+            padding: 0 2px;
+        }
 
-      .word-chip {
-        display: inline-block;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        color: var(--text-main);
-        padding: 12px 24px;
-        margin: 6px;
-        border-radius: 50px; /* 캡슐 모양 */
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s;
-      }
+        /* --- 빈칸 슬롯 스타일 --- */
+        .empty-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            height: 42px;
+            padding: 0 12px;
+            margin: 0 6px;
+            vertical-align: middle;
+            background-color: #e9ecef;
+            border: 2px solid #ced4da;
+            border-radius: 10px;
+            color: #495057;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transform: translateY(-2px);
+        }
 
-      .word-chip:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
-        border-color: var(--brand-color);
-        color: var(--brand-color);
-      }
+        .empty-slot.active-focus {
+            background-color: #fff;
+            border-color: var(--focus-color);
+            box-shadow: 0 0 0 4px var(--focus-glow);
+            transform: scale(1.05) translateY(-2px);
+            z-index: 10;
+        }
 
-      .word-chip.used {
-        opacity: 0.4;
-        transform: scale(0.95);
-        background-color: #e9ecef;
-        border-color: transparent;
-        box-shadow: none;
-        cursor: default;
-      }
+        .empty-slot.filled {
+            background-color: #e7f5ff;
+            border-color: var(--brand-color);
+            color: var(--brand-dark);
+        }
 
-      /* 버튼 스타일 */
-      .btn {
-        background-color: var(--text-main);
-        color: white;
-        border: none;
-        padding: 16px 32px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-radius: 12px;
-        cursor: pointer;
-        margin: 10px 5px;
-        transition: transform 0.2s, background 0.2s;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-      }
-      .btn:active {
-        transform: translateY(0);
-      }
+        .empty-slot.correct { background-color: #d3f9d8; border-color: var(--success-color); color: #2b8a3e; }
+        .empty-slot.wrong { background-color: #ffe3e3; border-color: var(--error-color); color: #c92a2a; text-decoration: line-through; }
 
-      .btn-primary {
-        background-color: var(--brand-dark);
-      }
-      .btn-primary:hover {
-        background-color: var(--brand-color);
-      }
+        /* --- 단어 칩 스타일 --- */
+        .word-bank-area {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 20px;
+        }
 
-      .btn-success {
-        background-color: var(--success-color);
-      }
-      .btn-success:hover {
-        background-color: #37b24d;
-      }
+        .word-chip {
+            display: inline-block;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            color: var(--text-main);
+            padding: 12px 24px;
+            margin: 6px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .word-chip:hover { transform: translateY(-3px); border-color: var(--brand-color); color: var(--brand-color); }
+        .word-chip.used { opacity: 0.4; transform: scale(0.95); background-color: #e9ecef; border-color: transparent; pointer-events: none; }
 
-      .btn-hint {
-        background-color: white;
-        color: var(--text-sub);
-        border: 2px solid #dee2e6;
-        box-shadow: none;
-      }
-      .btn-hint:hover {
-        border-color: var(--text-sub);
-        color: var(--text-main);
-      }
+        /* 버튼 */
+        .btn {
+            background-color: var(--text-main);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background-color: var(--brand-dark); }
+        .btn-success { background-color: var(--success-color); }
+        .btn-home { background-color: #868e96; }
+        .btn-hint { background-color: white; color: var(--text-sub); border: 2px solid #dee2e6; }
+        .btn-hint:hover { border-color: var(--text-sub); color: var(--text-main); }
 
-      /* 타이머 및 결과 */
-      .timer-display {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--focus-color);
-        margin: 20px 0;
-        font-variant-numeric: tabular-nums; /* 숫자 너비 고정 */
-      }
-
-      .result-badge {
-        font-size: 4rem;
-        margin-bottom: 20px;
-        display: block;
-      }
-      .result-score {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--brand-dark);
-      }
+        .timer-display { font-size: 2.5rem; font-weight: 800; color: var(--focus-color); margin: 20px 0; font-variant-numeric: tabular-nums; }
+        .result-score { font-size: 2rem; font-weight: 800; color: var(--brand-dark); }
+        
+        /* 모바일 대응 */
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+            .news-box { font-size: 1.1rem; padding: 20px; line-height: 2.0; }
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div id="start-screen" class="game-section active">
-        <h1>🧠 오늘의 두뇌 트레이닝</h1>
-        <p class="subtitle">
-          뉴스를 읽고 기억력을 테스트해보세요.<br />단어를 터치하여 문장을
-          완성하는 퍼즐입니다.
-        </p>
-        <div style="font-size: 5rem; margin: 40px 0">🧩</div>
-        <button class="btn btn-primary" onclick="startGame()">
-          지금 시작하기
-        </button>
-      </div>
+</head>
+<body>
 
-      <div id="reading-screen" class="game-section">
-        <h1>주요 단어 기억하기</h1>
-        <div class="timer-display" id="timer">30</div>
-        <div class="news-box" id="reading-content"></div>
-        <button class="btn btn-success" onclick="finishReadingEarly()">
-          다 읽었어요!
-        </button>
-      </div>
-
-      <div id="quiz-screen" class="game-section">
-        <h1 style="font-size: 1.5rem">반짝이는 빈칸을 채워주세요 ✨</h1>
-
-        <div class="news-box" id="quiz-content"></div>
-
-        <div class="word-bank-area" id="word-bank">
-          <p style="color: #adb5bd; font-size: 0.9rem; margin-top: 0">
-            👇 아래 단어를 선택하세요
-          </p>
-          <div id="chips-container"></div>
+<div class="container">
+    
+    <div id="menu-screen" class="game-section active">
+        <h1 style="color:var(--brand-dark)">12월 5주차 두뇌 훈련</h1>
+        <p class="subtitle">이번 주 업데이트된 뉴스를 확인하고<br>기억력을 테스트해보세요.</p>
+        
+        <div class="menu-grid">
+            <div class="menu-card" onclick="selectCategory('politics')">
+                <div class="menu-icon">⚖️</div>
+                <div class="menu-title">정치</div>
+                <div class="menu-desc">노인 일자리, 연금 소식</div>
+            </div>
+            <div class="menu-card" onclick="selectCategory('economy')">
+                <div class="menu-icon">💰</div>
+                <div class="menu-title">경제</div>
+                <div class="menu-desc">물가, 부동산, 수출</div>
+            </div>
+            <div class="menu-card" onclick="selectCategory('society')">
+                <div class="menu-icon">🏥</div>
+                <div class="menu-title">사회</div>
+                <div class="menu-desc">건강, 복지, 날씨</div>
+            </div>
+            <div class="menu-card" onclick="selectCategory('culture')">
+                <div class="menu-icon">🎭</div>
+                <div class="menu-title">문화</div>
+                <div class="menu-desc">여행, 축제, 트렌드</div>
+            </div>
         </div>
-
-        <div style="margin-top: 30px">
-          <button
-            class="btn btn-hint"
-            id="btn-hint"
-            onclick="openOriginalArticle()"
-          >
-            🔗 힌트 보기
-          </button>
-          <button
-            class="btn btn-primary"
-            id="btn-check"
-            onclick="checkAnswers()"
-          >
-            정답 확인
-          </button>
-          <button
-            class="btn btn-success"
-            id="btn-result"
-            style="display: none"
-            onclick="showResultPage()"
-          >
-            결과 보기 👉
-          </button>
-        </div>
-      </div>
-
-      <div id="result-screen" class="game-section">
-        <h1>결과 리포트</h1>
-        <div class="result-badge" id="result-emoji">🤔</div>
-        <div class="result-score" id="score-display"></div>
-        <p id="feedback-msg" class="subtitle" style="margin-top: 15px"></p>
-        <button class="btn btn-primary" onclick="location.reload()">
-          새로운 뉴스 보기
-        </button>
-      </div>
     </div>
 
-    <script>
-      // --- 데이터 (예시) ---
-      const todayNews = {
-        title: "잠실주공5단지, 조합원 지위 양도 제한... 집값은 '천정부지'",
-        url: "https://www.hankyung.com/article/2025123031671", // 실제 기사 링크 (예시)
-        content: `서울 송파구의 대표 {{재건축}} 단지인 잠실주공5단지가 구청에 {{사업시행인가}}를 신청함에 따라, 앞으로는 {{조합원}} 자격을 사고파는 것이 어려워집니다.
+    <div id="intro-screen" class="game-section">
+        <h1 id="intro-title"></h1>
+        <p class="subtitle">뉴스를 읽고 핵심 단어를 기억해주세요.<br>준비되셨나요?</p>
+        <div style="font-size: 4rem; margin: 30px 0;">📰</div>
+        <button class="btn btn-home" onclick="goHome()">뒤로가기</button>
+        <button class="btn btn-primary" onclick="startGame()">문제 풀기</button>
+    </div>
 
-관련 법에 따르면 재건축 사업이 속도를 내면 투기 방지를 위해 조합원 지위 {{양도}}가 금지되기 때문입니다. 이 소식에 거래 가능한 매물은 급격히 줄어들 전망이지만, 오히려 희소성이 부각되며 전용 84㎡ 가격이 {{45억 원}}을 넘어서는 등 가격 상승세는 계속되고 있습니다.`,
-      };
+    <div id="reading-screen" class="game-section">
+        <h1>핵심 단어 기억하기</h1>
+        <div class="timer-display" id="timer">30</div>
+        <div class="news-box" id="reading-content"></div>
+        <button class="btn btn-success" onclick="finishReadingEarly()">다 읽었어요!</button>
+    </div>
 
-      const readingTimeLimit = 30;
-      let timeLeft = readingTimeLimit;
-      let timerInterval;
-      let correctAnswers = [];
+    <div id="quiz-screen" class="game-section">
+        <h1 style="font-size:1.5rem;">빈칸을 채워주세요 ✨</h1>
+        <div class="news-box" id="quiz-content"></div>
+        <div class="word-bank-area">
+            <p style="color:#adb5bd; font-size:0.9rem; margin-top:0;">👇 아래 단어를 선택하세요</p>
+            <div id="chips-container"></div>
+        </div>
+        <div style="margin-top: 30px;">
+            <button class="btn btn-hint" id="btn-hint" onclick="openOriginalArticle()">🔗 힌트 보기</button>
+            <button class="btn btn-primary" id="btn-check" onclick="checkAnswers()">정답 확인</button>
+            <button class="btn btn-success" id="btn-result" style="display:none;" onclick="showResultPage()">결과 보기 👉</button>
+        </div>
+    </div>
 
-      // --- 로직 (디자인만 변경되었으므로 로직은 유사함) ---
+    <div id="result-screen" class="game-section">
+        <h1>결과 리포트</h1>
+        <div style="font-size: 4rem; margin-bottom: 20px;" id="result-emoji">🤔</div>
+        <div class="result-score" id="score-display"></div>
+        <p id="feedback-msg" class="subtitle" style="margin-top:15px;"></p>
+        <button class="btn btn-home" onclick="goHome()">다른 주제 선택하기</button>
+    </div>
+</div>
 
-      function prepareReadingText() {
-        // 하이라이트 디자인 적용
-        let formattedText = todayNews.content.replace(
-          /\{\{(.*?)\}\}/g,
-          '<span class="highlight">$1</span>'
-        );
-        document.getElementById("reading-content").innerHTML = formattedText;
-      }
+<script>
+    // --- [데이터] 주간 뉴스 샘플 (정치, 경제, 사회, 문화) ---
+    const newsData = {
+        politics: {
+            categoryName: "정치/안보",
+            title: "北, 장거리미사일 발사…\"1만여초 날아 표적 명중\"",
+            url: "https://www.hankyung.com/article/2025122908041", // 실제 관련 기사 링크
+            content: `북한이 {{김정은}} 위원장이 지켜보는 가운데 서해상에서 전략 {{순항미사일}} 발사 훈련을 진행했습니다. 미사일은 2시간 50분가량 비행해 표적을 정확히 명중시켰습니다.
 
-      function prepareQuizAndBank() {
+        김 위원장은 이를 두고 "{{핵 억제력}}을 점검했다"고 평가하며, 앞으로도 국가의 핵 전투 무력을 지속적으로 {{강화}}해 나가겠다고 강조했습니다.`
+        },
+        economy: {
+            categoryName: "경제 뉴스",
+            title: "올해 환율, 외환위기 때보다 높았다…韓 GDP 순위 밀리나",
+            url: "https://www.hankyung.com/article/2025123034221",
+            content: `올해 원·달러 연평균 {{환율}}이 사상 처음으로 1,400원대를 넘어섰습니다. 이는 과거 1998년 {{외환위기}} 때보다도 높은 역대 최고치 기록입니다.
+
+글로벌 달러 약세에도 원화 가치만 하락하여 경제 성적표인 {{GDP}} 순위 하락이 우려되지만, 다행히 연말에는 당국의 관리로 상승폭이 줄어 기업들의 이자 부담과 {{부채 비율}} 관리에는 다소 숨통이 트일 전망입니다.`
+        },
+        society: {
+            categoryName: "사회 뉴스",
+            title: "좁아진 채용문…60%대로 떨어진 대졸자 취업률",
+            url: "https://www.hankyung.com/article/2025123032981", // 관련 기사 링크
+            content: `경기 불황의 여파로 {{채용}} 문이 좁아지면서, 지난해 국내 대학 졸업생들의 {{취업률}}이 60%대로 하락했습니다. 이는 70%대를 기록했던 전년보다 낮아진 수치입니다.
+
+        반면, 국내에서 공부한 외국인 {{유학생}}의 취업률은 30%를 넘어서며 크게 상승했습니다. 교육부는 전반적인 {{경기 침체}}가 우리 청년들의 취업난을 가중시킨 주된 원인이라고 분석했습니다.`
+        },
+        culture: {
+            categoryName: "문화 뉴스",
+            title: "\"인디아나 존스 시대는 끝났다\"…'문화 탈서구화' 선포한 이집트 대박물관",
+            url: "https://www.hankyung.com/article/202512301903i", // 관련 기사 링크
+            content: `최근 제국주의 시절 서구 열강이 가져간 문화유산의 {{반환}}을 요구하는 목소리가 전 세계적으로 높아지고 있습니다.
+
+        가장 치열한 곳은 {{이집트}}입니다. 이집트는 최근 세계 최대 규모의 '이집트 {{대박물관}}'을 개관하며 유물을 안전하게 보관할 능력을 증명했습니다. 이를 근거로 독일의 네페르티티 흉상, 영국의 로제타석 등 핵심 {{유물}}을 돌려달라고 강력히 주장하고 있습니다.`
+        },
+    };
+
+    let currentCategory = null;
+    let currentNews = null;
+    const readingTimeLimit = 30;
+    let timeLeft = readingTimeLimit;
+    let timerInterval;
+    let correctAnswers = [];
+    let lastScore = 0;
+    let lastTotal = 0;
+
+    // --- [로직 1] 메뉴 및 데이터 선택 ---
+    
+    function selectCategory(categoryKey) {
+        currentCategory = categoryKey;
+        currentNews = newsData[categoryKey];
+        
+        // 인트로 화면 설정
+        document.getElementById('intro-title').innerText = `[${currentNews.categoryName}] 도전!`;
+        showSection('intro-screen');
+    }
+
+    function goHome() {
+        // 초기화 후 메뉴로 이동
+        clearInterval(timerInterval);
+        currentCategory = null;
+        showSection('menu-screen');
+    }
+
+    // --- [로직 2] 게임 진행 (읽기 -> 퀴즈 -> 결과) ---
+
+    function prepareReadingText() {
+        let formattedText = currentNews.content.replace(/\{\{(.*?)\}\}/g, '<span class="highlight">$1</span>');
+        document.getElementById('reading-content').innerHTML = formattedText; 
+    }
+
+    function prepareQuizAndBank() {
         correctAnswers = [];
         let slotIndex = 0;
 
-        // 빈칸 생성 (디자인 개선된 empty-slot 클래스 적용)
-        let quizText = todayNews.content.replace(
-          /\{\{(.*?)\}\}/g,
-          function (match, p1) {
+        // 빈칸 생성
+        let quizText = currentNews.content.replace(/\{\{(.*?)\}\}/g, function(match, p1) {
             correctAnswers.push(p1);
-            // vertical alignment를 위해 스타일 조정 없이 클래스로만 제어
             let slotHtml = `<span class="empty-slot" id="slot-${slotIndex}" onclick="returnWord(${slotIndex})" data-answer="${p1}"></span>`;
             slotIndex++;
             return slotHtml;
-          }
-        );
-        document.getElementById("quiz-content").innerHTML = quizText;
+        });
+        document.getElementById('quiz-content').innerHTML = quizText;
 
-        // 단어 칩 생성
-        const chipsContainer = document.getElementById("chips-container");
-        chipsContainer.innerHTML = "";
-
-        let shuffledAnswers = [...correctAnswers];
-        // 셔플 알고리즘
+        // 단어 칩 생성 (셔플)
+        const chipsContainer = document.getElementById('chips-container');
+        chipsContainer.innerHTML = '';
+        
+        let shuffledAnswers = [...correctAnswers]; 
+        // 간단한 셔플
         for (let i = shuffledAnswers.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffledAnswers[i], shuffledAnswers[j]] = [
-            shuffledAnswers[j],
-            shuffledAnswers[i],
-          ];
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
         }
 
         shuffledAnswers.forEach((word, index) => {
-          let btn = document.createElement("div"); // button 대신 div로 변경 (스타일링 용이)
-          btn.className = "word-chip";
-          btn.innerText = word;
-          btn.id = `chip-${index}`;
-          btn.onclick = function () {
-            selectWord(this, word);
-          };
-          chipsContainer.appendChild(btn);
+            let btn = document.createElement('div');
+            btn.className = 'word-chip';
+            btn.innerText = word;
+            btn.id = `chip-${index}`;
+            btn.onclick = function() { selectWord(this, word); };
+            chipsContainer.appendChild(btn);
         });
-      }
+    }
 
-      // 포커스 업데이트 (CSS Glow 효과 적용)
-      function updateFocus() {
-        document
-          .querySelectorAll(".empty-slot")
-          .forEach((slot) => slot.classList.remove("active-focus"));
-        const targetSlot = document.querySelector(".empty-slot:not(.filled)");
-        if (targetSlot) targetSlot.classList.add("active-focus");
-      }
+    // 포커스 로직 (빈칸 강조)
+    function updateFocus() {
+        document.querySelectorAll('.empty-slot').forEach(slot => slot.classList.remove('active-focus'));
+        const targetSlot = document.querySelector('.empty-slot:not(.filled)');
+        if (targetSlot) targetSlot.classList.add('active-focus');
+    }
 
-      function selectWord(chipElement, word) {
-        const targetSlot = document.querySelector(".empty-slot:not(.filled)");
+    function selectWord(chipElement, word) {
+        const targetSlot = document.querySelector('.empty-slot:not(.filled)');
         if (targetSlot) {
-          targetSlot.innerText = word;
-          targetSlot.classList.add("filled");
-          targetSlot.dataset.sourceChipId = chipElement.id;
-
-          // 칩 애니메이션과 함께 비활성화
-          chipElement.classList.add("used");
-
-          updateFocus();
+            targetSlot.innerText = word;
+            targetSlot.classList.add('filled');
+            targetSlot.dataset.sourceChipId = chipElement.id;
+            chipElement.classList.add('used');
+            updateFocus(); 
         } else {
-          // 빈칸이 꽉 찼을 때 흔들림 효과 같은걸 줄 수 있음 (여기선 생략)
-          alert("빈칸이 모두 채워졌습니다. 수정하려면 빈칸을 누르세요.");
+            alert("빈칸이 모두 채워졌습니다. 수정하려면 빈칸을 누르세요.");
         }
-      }
+    }
 
-      function returnWord(slotIndex) {
+    function returnWord(slotIndex) {
         const slot = document.getElementById(`slot-${slotIndex}`);
-        if (slot.classList.contains("filled")) {
-          const chipId = slot.dataset.sourceChipId;
-          const chip = document.getElementById(chipId);
-          if (chip) chip.classList.remove("used");
+        if (slot.classList.contains('filled')) {
+            const chipId = slot.dataset.sourceChipId;
+            const chip = document.getElementById(chipId);
+            if (chip) chip.classList.remove('used');
 
-          slot.innerText = "";
-          slot.classList.remove("filled");
-          delete slot.dataset.sourceChipId;
-
-          updateFocus();
+            slot.innerText = "";
+            slot.classList.remove('filled');
+            delete slot.dataset.sourceChipId;
+            updateFocus();
         }
-      }
+    }
 
-      function startGame() {
+    function startGame() {
         prepareReadingText();
         prepareQuizAndBank();
-        showSection("reading-screen");
-
+        showSection('reading-screen');
+        
         timeLeft = readingTimeLimit;
-        document.getElementById("timer").innerText = timeLeft;
-        timerInterval = setInterval(() => {
-          timeLeft--;
-          document.getElementById("timer").innerText = timeLeft;
-          if (timeLeft <= 0) finishReadingEarly();
-        }, 1000);
-      }
-
-      function finishReadingEarly() {
+        document.getElementById('timer').innerText = timeLeft;
+        
+        // 타이머 시작
         clearInterval(timerInterval);
-        showSection("quiz-screen");
-        setTimeout(updateFocus, 100);
-      }
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) finishReadingEarly();
+        }, 1000);
+    }
 
-      function checkAnswers() {
-        const slots = document.querySelectorAll(".empty-slot");
+    function finishReadingEarly() {
+        clearInterval(timerInterval);
+        showSection('quiz-screen');
+        setTimeout(updateFocus, 100); 
+        
+        // 버튼 초기화 (다시하기를 대비)
+        document.getElementById('word-bank').style.display = 'block';
+        document.getElementById('btn-check').style.display = 'inline-block';
+        document.getElementById('btn-hint').style.display = 'inline-block';
+        document.getElementById('btn-result').style.display = 'none';
+    }
+
+    function checkAnswers() {
+        const slots = document.querySelectorAll('.empty-slot');
         let correctCount = 0;
         let totalCount = slots.length;
 
-        document
-          .querySelectorAll(".empty-slot")
-          .forEach((s) => s.classList.remove("active-focus"));
+        document.querySelectorAll('.empty-slot').forEach(s => s.classList.remove('active-focus'));
 
-        slots.forEach((slot) => {
-          const userAnswer = slot.innerText.trim();
-          const correctAnswer = slot.dataset.answer;
+        slots.forEach(slot => {
+            const userAnswer = slot.innerText.trim();
+            const correctAnswer = slot.dataset.answer;
 
-          slot.onclick = null; // 클릭 방지
-          slot.style.cursor = "default";
+            slot.onclick = null; 
+            slot.style.cursor = "default";
 
-          if (userAnswer === correctAnswer) {
-            slot.classList.add("correct");
-            correctCount++;
-          } else {
-            slot.classList.add("wrong");
-          }
+            if (userAnswer === correctAnswer) {
+                slot.classList.add('correct');
+                correctCount++;
+            } else {
+                slot.classList.add('wrong');
+            }
         });
 
-        document.getElementById("word-bank").style.display = "none";
-        document.getElementById("btn-check").style.display = "none";
-        document.getElementById("btn-hint").style.display = "none";
-        document.getElementById("btn-result").style.display = "inline-block";
+        document.getElementById('word-bank').style.display = 'none';
+        document.getElementById('btn-check').style.display = 'none';
+        document.getElementById('btn-hint').style.display = 'none';
+        document.getElementById('btn-result').style.display = 'inline-block';
 
-        window.lastScore = correctCount;
-        window.lastTotal = totalCount;
-      }
+        lastScore = correctCount;
+        lastTotal = totalCount;
+    }
 
-      function showResultPage() {
-        showSection("result-screen");
-        const scoreDisplay = document.getElementById("score-display");
-        const feedbackMsg = document.getElementById("feedback-msg");
-        const emojiDisplay = document.getElementById("result-emoji");
-
-        const score = window.lastScore;
-        const total = window.lastTotal;
-        const percentage = (score / total) * 100;
-
-        scoreDisplay.innerText = `${total}문제 중 ${score}개 정답`;
-
-        if (percentage === 100) {
-          emojiDisplay.innerText = "🏆";
-          feedbackMsg.innerText = "완벽합니다! 명석한 두뇌의 소유자시군요.";
-        } else if (percentage >= 70) {
-          emojiDisplay.innerText = "👏";
-          feedbackMsg.innerText = "훌륭해요! 대부분의 내용을 기억하셨습니다.";
+    function showResultPage() {
+        showSection('result-screen');
+        const scoreDisplay = document.getElementById('score-display');
+        const feedbackMsg = document.getElementById('feedback-msg');
+        const emojiDisplay = document.getElementById('result-emoji');
+        
+        scoreDisplay.innerText = `${lastTotal}문제 중 ${lastScore}개 정답`;
+        
+        if (lastScore === lastTotal) {
+            emojiDisplay.innerText = "🏆";
+            feedbackMsg.innerText = "대단해요! 해당 분야의 전문가시군요.";
+        } else if (lastScore >= lastTotal * 0.7) {
+            emojiDisplay.innerText = "👏";
+            feedbackMsg.innerText = "훌륭합니다! 뉴스 내용을 잘 기억하고 계시네요.";
         } else {
-          emojiDisplay.innerText = "🍀";
-          feedbackMsg.innerText =
-            "수고하셨어요! 매일 연습하면 기억력이 좋아집니다.";
+            emojiDisplay.innerText = "🍀";
+            feedbackMsg.innerText = "수고하셨어요! 꾸준히 하시면 더 좋아질 거예요.";
         }
-      }
+    }
 
-      function openOriginalArticle() {
-        window.open(todayNews.url, "_blank");
-      }
+    function openOriginalArticle() {
+        window.open(currentNews.url, '_blank');
+    }
 
-      function showSection(sectionId) {
-        document
-          .querySelectorAll(".game-section")
-          .forEach((s) => s.classList.remove("active"));
-        document.getElementById(sectionId).classList.add("active");
-      }
-    </script>
-  </body>
+    function showSection(sectionId) {
+        document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+    }
+</script>
+
+</body>
 </html>
